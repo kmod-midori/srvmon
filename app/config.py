@@ -1,7 +1,7 @@
 """
 Global Flask Application Setting
 See `.flaskenv` for default settings.
- """
+"""
 
 import os
 from app import app
@@ -13,8 +13,11 @@ class Config(object):
     # Set FLASK_SECRET on your production Environment
     SECRET_KEY = os.getenv('FLASK_SECRET', 'Secret')
 
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///app.db')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
     APP_DIR = os.path.dirname(__file__)
-    ROOT_DIR = os.path.dirname(APP_DIR) # Last level
+    ROOT_DIR = os.path.dirname(APP_DIR)  # Last level
     DIST_DIR = os.path.join(ROOT_DIR, 'dist')
 
     if not os.path.exists(DIST_DIR):

@@ -1,7 +1,7 @@
 <template>
   <v-navigation-drawer :value="value" @change="emit('change', $event)" app>
     <v-list nav dense>
-      <v-list-item v-for="item in items" :key="item.title" link>
+      <v-list-item v-for="item in items" :key="item.title" :to="item.to">
         <v-list-item-icon>
           <v-icon>{{ item.icon }}</v-icon>
         </v-list-item-icon>
@@ -24,6 +24,17 @@ export default {
       {
         icon: "mdi-home",
         title: "Home",
+        to: "/",
+      },
+      {
+        icon: "mdi-server",
+        title: "Servers",
+        to: "/servers",
+      },
+      {
+        icon: "mdi-cog",
+        title: "Settings",
+        to: "/settings",
       },
     ],
   }),
