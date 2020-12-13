@@ -1,4 +1,5 @@
 # srvmon
+A simple yet useful server status monitoring tool.
 
 ## Project setup
 ```
