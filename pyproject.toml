@@ -16,6 +16,7 @@ python-dotenv = "^0.15.0"
 Flask-Migrate = "^2.5.3"
 email_validator = "^1.1.2"
 flask-security-too = "^3.4.4"
+eventlet = "^0.29.1"
 
 [tool.poetry.dev-dependencies]
 yapf = "^0.30.0"

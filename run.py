@@ -1,9 +1,9 @@
-import os
+from dotenv import load_dotenv
+load_dotenv(dotenv_path="./.flaskenv")
+
 from app import app
+from app.socketio import socketio
 
-app.run(port=5000)
-
+socketio.run(app, port=5000)
 # To Run:
 # python run.py
-# or
-# python -m flask run
