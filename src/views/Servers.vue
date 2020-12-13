@@ -6,7 +6,7 @@
       class="elevation-1"
     ></v-data-table>
     <v-fab-transition>
-      <v-btn fab fixed bottom right dark><v-icon>mdi-plus</v-icon></v-btn>
+      <v-btn fab fixed bottom right dark to="/servers/add"><v-icon>mdi-plus</v-icon></v-btn>
     </v-fab-transition>
   </div>
 </template>
