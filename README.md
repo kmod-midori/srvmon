@@ -1,12 +1,18 @@
-# srvmon
+# SrvMon
 A simple yet useful server status monitoring tool.
+
+## Authentation
+This application does not have a complete user management system as it is meant to be lightweight.
+Anyone with such requirements should resort to a more complete system. 
 
 ## Project setup
 ```
+poetry install
 npm install
+npm run build # Compiles and minifies the frontend for production
 ```
 
-### Compiles and hot-reloads for development
+### Compiles and hot-reloads for frontend development
 ```
 npm run serve
 ```

@@ -32,9 +32,9 @@
             </v-list>
           </v-card>
         </v-col>
+        <!-- Mode Specific -->
         <v-col class="py-0">
           <v-row>
-            <!-- Mode Specific -->
             <template v-if="mode == 0">
               <v-col sm="12" md="8">
                 <v-text-field

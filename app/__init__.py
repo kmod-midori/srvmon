@@ -8,6 +8,7 @@ app.logger.info('FLASK_ENV = {}'.format(Config.FLASK_ENV))
 
 from .cron import cron
 from .db import db, migrate
+from .security import security
 
 @app.route('/')
 def index_client():

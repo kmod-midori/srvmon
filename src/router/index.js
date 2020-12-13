@@ -12,12 +12,26 @@ const routes = [
   {
     path: "/servers/add",
     name: "Add Server",
-    component: () => import(/* webpackChunkName: "add_server" */ "../views/AddServer.vue"),
+    component: () =>
+      import(/* webpackChunkName: "add_server" */ "../views/AddServer.vue"),
   },
   {
     path: "/servers",
     name: "Servers",
-    component: () => import(/* webpackChunkName: "servers" */ "../views/Servers.vue"),
+    component: () =>
+      import(/* webpackChunkName: "servers" */ "../views/Servers.vue"),
+  },
+  {
+    path: "/contacts",
+    name: "Contacts",
+    component: () =>
+      import(/* webpackChunkName: "contacts" */ "../views/Contacts.vue"),
+  },
+  {
+    path: "/settings",
+    name: "Settings",
+    component: () =>
+      import(/* webpackChunkName: "settings" */ "../views/Settings.vue"),
   },
 ];
 

@@ -32,6 +32,11 @@ export default {
         to: "/servers",
       },
       {
+        icon: "mdi-contacts",
+        title: "Contacts",
+        to: "/contacts",
+      },
+      {
         icon: "mdi-cog",
         title: "Settings",
         to: "/settings",
