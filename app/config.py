@@ -33,9 +33,6 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    CELERY_BROKER_URL = 'redis://localhost:6379'
-    CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-
     MAIL_SUPPRESS_SEND = app.testing or not bool(int(os.getenv('MAIL_ENABLED', '1')))
     MAIL_SERVER = os.getenv('MAIL_SERVER', 'localhost')
     MAIL_PORT = int(os.getenv('MAIL_PORT', '25'))

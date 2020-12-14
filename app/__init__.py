@@ -9,9 +9,9 @@ app.logger.info('FLASK_ENV = {}'.format(Config.FLASK_ENV))
 from .cron import cron
 from .db import db, migrate
 from .security import security
-from .celery import celery
 from .mail import mail
 
-@app.route('/')
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
 def index_client():
     return app.send_static_file('index.html')
