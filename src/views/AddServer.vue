@@ -16,7 +16,7 @@
 
       <v-row>
         <!-- Mode Selector -->
-        <v-col sm="12" md="5">
+        <v-col sm="12" md="6">
           <v-card>
             <v-list>
               <v-list-item-group v-model="mode" mandatory>
