@@ -111,7 +111,15 @@
     <div>{{ $v }}</div>
 
     <v-fab-transition>
-      <v-btn fab fixed bottom right :color="$v.$invalid ? 'error' : 'success'">
+      <v-btn
+        fab
+        fixed
+        bottom
+        right
+        :disabled="$v.$invalid"
+        color="success"
+        @click="submit"
+      >
         <v-icon>mdi-content-save</v-icon>
       </v-btn>
     </v-fab-transition>
@@ -259,6 +267,31 @@ export default {
       !v.required && errors.push("At least one status code is required");
       v.$invalid && errors.push("Invalid status code");
       return errors;
+    },
+  },
+  methods: {
+    submit() {
+      const server = {
+        label: this.label,
+        timeout: parseInt(this.timeout, 10),
+        mode: this.modes[this.mode].key,
+      };
+
+      switch (this.mode) {
+        case 0:
+          server.url = this.url;
+          server.validStatus = this.validStatus.map((status) =>
+            parseInt(status, 10)
+          );
+          break;
+        case 1:
+          server.address = this.address;
+          server.port = parseInt(this.port, 10);
+          break;
+        default:
+          break;
+      }
+      console.log(server);
     },
   },
 };

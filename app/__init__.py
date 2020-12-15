@@ -1,5 +1,4 @@
-import os
-from flask import Flask, current_app, send_file
+from flask import Flask
 
 app = Flask(__name__, static_url_path='', static_folder='../dist')
 
@@ -10,6 +9,9 @@ from .cron import cron
 from .db import db, migrate
 from .security import security
 from .mail import mail
+from .api import api_bp
+
+app.register_blueprint(api_bp, url_prefix='/api')
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')

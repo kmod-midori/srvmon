@@ -16,4 +16,47 @@ class Role(db.Model, fsqla.FsRoleMixin):
 
 
 class User(db.Model, fsqla.FsUserMixin):
-    pass
+    contacts = db.relationship('Contact',
+                               backref=db.backref('user', lazy=True),
+                               lazy=True)
+
+
+server_alert_user = db.Table(
+    "server_alert_user",
+    db.Column('server_id',
+              db.Integer,
+              db.ForeignKey("server.id"),
+              primary_key=True),
+    db.Column('user_id',
+              db.Integer,
+              db.ForeignKey("user.id"),
+              primary_key=True))
+
+
+class Server(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    label = db.Column(db.Text, nullable=False)
+    config = db.Column(db.Text, nullable=False)  # Stored as JSON
+    enabled = db.Column(db.Boolean, nullable=False)
+    users = db.relationship('User',
+                            secondary=server_alert_user,
+                            lazy=True,
+                            backref=db.backref('servers', lazy=True))
+    records = db.relationship('Record',
+                              lazy='dynamic',
+                              backref=db.backref('server', lazy=False))
+
+
+class Contact(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    type = db.Column(db.String(20), nullable=False)
+    config = db.Column(db.Text, nullable=False)  # Stored as JSON
+    enabled = db.Column(db.Boolean, nullable=False)
+
+
+class Record(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    server_id = db.Column(db.Integer,
+                          db.ForeignKey("server.id"),
+                          nullable=False)
