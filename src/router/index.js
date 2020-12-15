@@ -10,6 +10,13 @@ const routes = [
     component: () => import(/* webpackChunkName: "home" */ "../views/Home.vue"),
   },
   {
+    path: "/login",
+    name: "Login",
+    meta: { unauth: true },
+    component: () =>
+      import(/* webpackChunkName: "login" */ "../views/Login.vue"),
+  },
+  {
     path: "/servers/add",
     name: "Add Server",
     component: () =>

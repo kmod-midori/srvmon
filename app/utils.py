@@ -5,7 +5,7 @@ def render_json(payload, code=200, headers=None):
     if not headers:
         headers = dict()
     headers["Content-Type"] = "application/json"
-    payload = dict(meta=dict(code=code), response=payload)
+    payload = dict(meta=dict(code=code), payload=payload)
     return make_response(jsonify(payload), code, headers)
 
 

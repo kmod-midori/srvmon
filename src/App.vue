@@ -7,6 +7,7 @@
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
+      {{ $store.state.user.user }}
     </v-app-bar>
 
     <NavDrawer v-model="drawer" />
@@ -30,5 +31,9 @@ export default {
   data: () => ({
     drawer: false,
   }),
+
+  mounted() {
+    this.$store.dispatch("user/init");
+  }
 };
 </script>
