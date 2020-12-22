@@ -1,6 +1,7 @@
 import Vue from "vue";
 import axios from "axios";
 import router from "../router";
+import toast from "./notification";
 
 const instance = axios.create({ baseURL: "/api", maxRedirects: 0 });
 
@@ -16,7 +17,14 @@ instance.interceptors.response.use(
 
       if (!meta.unauth) {
         router.replace("/login");
+        return;
       }
+    }
+    let payload = err.response.data.payload;
+    if (payload && payload.error) {
+      toast("error", payload.error);
+    } else {
+      toast("error", err.toString());
     }
     return Promise.reject(err);
   }

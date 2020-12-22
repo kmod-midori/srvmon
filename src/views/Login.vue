@@ -89,8 +89,6 @@ export default {
             if (payload.error) {
               if (payload.error.endsWith("not logged in.")) {
                 this.loginOk();
-              } else {
-                this.$notify("error", payload.error);
               }
             }
           }

@@ -1,5 +1,7 @@
 from app import app
 
+import json
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_security.models import fsqla_v2 as fsqla
@@ -36,6 +38,7 @@ server_alert_user = db.Table(
 class Server(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     label = db.Column(db.Text, nullable=False)
+    mode = db.Column(db.Text, nullable=False)
     config = db.Column(db.Text, nullable=False)  # Stored as JSON
     enabled = db.Column(db.Boolean, nullable=False)
     users = db.relationship('User',
@@ -45,6 +48,12 @@ class Server(db.Model):
     records = db.relationship('Record',
                               lazy='dynamic',
                               backref=db.backref('server', lazy=False))
+
+    def set_config(self, config):
+        self.config = json.dumps(config)
+
+    def get_config(self):
+        return json.loads(self.config)
 
 
 class Contact(db.Model):

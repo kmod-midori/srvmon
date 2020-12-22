@@ -98,7 +98,7 @@
         <v-col sm="12" md="4">
           <v-text-field
             v-model="timeout"
-            label="Interval/Timeout (seconds)"
+            :label="timeoutLabel"
             required
             :error-messages="timeoutErrors"
             @input="$v.timeout.$touch()"
@@ -172,7 +172,7 @@ export default {
   data() {
     return {
       label: "New Server",
-      mode: "active-http",
+      mode: 0,
       timeout: 300,
       url: "",
       address: "",
@@ -222,6 +222,19 @@ export default {
     };
   },
   computed: {
+    timeoutLabel() {
+      let ret = "";
+      switch (this.mode) {
+        case 0:
+        case 1:
+          ret = "Interval";
+          break;
+        case 2:
+          ret = "Timeout";
+          break;
+      }
+      return ret + " (seconds)";
+    },
     labelErrors() {
       const errors = [];
       if (!this.$v.label.$dirty) return errors;
@@ -270,28 +283,34 @@ export default {
     },
   },
   methods: {
-    submit() {
+    async submit() {
       const server = {
         label: this.label,
         timeout: parseInt(this.timeout, 10),
         mode: this.modes[this.mode].key,
+        config: {},
       };
 
       switch (this.mode) {
         case 0:
-          server.url = this.url;
-          server.validStatus = this.validStatus.map((status) =>
-            parseInt(status, 10)
-          );
+          server.config = {
+            url: this.url,
+            validStatus: this.validStatus.map((status) => parseInt(status, 10)),
+          };
           break;
         case 1:
-          server.address = this.address;
-          server.port = parseInt(this.port, 10);
+          server.config = {
+            address: this.address,
+            port: parseInt(this.port, 10),
+          };
           break;
         default:
           break;
       }
-      console.log(server);
+      
+      await this.$http.put("/servers", server);
+      this.$notify("success", "Server added.");
+      this.$router.back();
     },
   },
 };
