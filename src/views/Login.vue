@@ -76,7 +76,7 @@ export default {
           password: this.password,
         })
         .then(
-          function () {
+          () => {
             this.loginOk();
           },
           (err) => {
@@ -99,10 +99,10 @@ export default {
           this.loading = false;
         });
     },
-  },
-  loginOk() {
-    this.$router.replace("/");
-    this.$notify("success", "You are logged in.");
+    loginOk() {
+      this.$router.replace("/");
+      this.$notify("success", "You are logged in.");
+    },
   },
 };
 </script>

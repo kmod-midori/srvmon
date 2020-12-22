@@ -7,13 +7,24 @@
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
-      {{ $store.state.user.user }}
+      <v-menu v-if="user" open-on-hover offset-y>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn dark v-bind="attrs" v-on="on" text>
+            {{ user.email }}
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item link @click="logout">
+            <v-list-item-title>Logout</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </v-app-bar>
 
     <NavDrawer v-model="drawer" />
 
     <v-main>
-      <v-container><router-view /></v-container>
+      <v-container fluid><router-view /></v-container>
     </v-main>
   </v-app>
 </template>
@@ -34,6 +45,17 @@ export default {
 
   mounted() {
     this.$store.dispatch("user/init");
+  },
+  computed: {
+    user() {
+      return this.$store.state.user.user || {};
+    },
+  },
+  methods: {
+    async logout() {
+      await this.$http.post("/accounts/logout");
+      this.$router.go("/login");
+    }
   }
 };
 </script>

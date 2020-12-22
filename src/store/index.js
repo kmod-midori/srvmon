@@ -24,7 +24,7 @@ const user = {
     },
     async login({ dispatch }, req) {
       await axios.post("accounts/login", req);
-      await dispatch("accounts/init");
+      await dispatch("init");
     },
   },
   getters: {

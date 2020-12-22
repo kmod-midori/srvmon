@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "axios": "^0.21.0",
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "noty": "^3.2.0-beta",
     "register-service-worker": "^1.7.1",
@@ -17,7 +17,7 @@
     "vue-notifications": "^1.0.2",
     "vue-router": "^3.2.0",
     "vuelidate": "^0.7.6",
-    "vuetify": "^2.2.11",
+    "vuetify": "^2.3.21",
     "vuex": "^3.4.0"
   },
   "devDependencies": {
@@ -29,12 +29,12 @@
     "@vue/cli-service": "~4.5.0",
     "@vue/eslint-config-standard": "^6.0.0",
     "babel-eslint": "^10.1.0",
-    "eslint": "^7.12.1",
-    "eslint-config-prettier": "^7.0.0",
+    "eslint": "^7.16.0",
+    "eslint-config-prettier": "^7.1.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-vue": "^7.2.0",
+    "eslint-plugin-vue": "^7.3.0",
     "prettier": "^2.2.1",
     "sass": "^1.26.5",
     "sass-loader": "^10.1.0",
