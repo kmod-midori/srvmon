@@ -95,20 +95,29 @@
       </v-row>
       <v-row>
         <!-- Timeout -->
-        <v-col sm="12" md="4">
+        <v-col sm="12" md="4" v-if="mode !== 2">
           <v-text-field
             v-model="timeout"
-            :label="timeoutLabel"
+            label="Timeout (ms)"
             required
             :error-messages="timeoutErrors"
             @input="$v.timeout.$touch()"
             @blur="$v.timeout.$touch()"
           ></v-text-field>
         </v-col>
+        <!-- Interval -->
+        <v-col sm="12" md="4">
+          <v-text-field
+            v-model="interval"
+            label="Interval (seconds)"
+            required
+            :error-messages="intervalErrors"
+            @input="$v.interval.$touch()"
+            @blur="$v.interval.$touch()"
+          ></v-text-field>
+        </v-col>
       </v-row>
     </v-form>
-
-    <div>{{ $v }}</div>
 
     <v-fab-transition>
       <v-btn
@@ -142,15 +151,17 @@ const url = (value) => !helpers.req(value) || !!isWebUri(value);
 export default {
   mixins: [validationMixin],
   validations() {
+    const timeV = {
+      required,
+      integer,
+      minValue: minValue(1),
+    };
+
     const v = {
       label: {
         required,
       },
-      timeout: {
-        required,
-        integer,
-        minValue: minValue(1),
-      },
+      interval: timeV,
     };
 
     if (this.mode === 0) {
@@ -162,18 +173,22 @@ export default {
           between: between(100, 599),
         },
       };
+      v.timeout = timeV;
     } else if (this.mode === 1) {
       v.port = { required, integer, between: between(1, 65535) };
       v.address = { required };
+      v.timeout = timeV;
     }
 
     return v;
   },
   data() {
     return {
+      editId: null,
       label: "New Server",
       mode: 0,
-      timeout: 300,
+      timeout: 3000,
+      interval: 300,
       url: "",
       address: "",
       port: 22,
@@ -220,6 +235,35 @@ export default {
       ],
       validStatus: ["200", "204"],
     };
+  },
+  mounted() {
+    if (this.$route.params.id) {
+      this.editId = parseInt(this.$route.params.id, 10);
+      this.$http.get(`/servers/${this.editId}`).then((resp) => {
+        const server = resp.data.payload;
+        this.label = server.label;
+        this.interval = server.config.interval;
+        switch (server.mode) {
+          case "active-http":
+            this.mode = 0;
+            this.timeout = server.config.timeout;
+            this.url = server.config.url;
+            this.validStatus = server.config.validStatus.map((s) =>
+              s.toString()
+            );
+            break;
+          case "active-tcp":
+            this.mode = 1;
+            this.address = server.config.address;
+            this.port = server.config.port;
+            this.timeout = server.config.timeout;
+            break;
+          case "passive-http":
+            this.mode = 2;
+            break;
+        }
+      });
+    }
   },
   computed: {
     timeoutLabel() {
@@ -268,9 +312,18 @@ export default {
       const errors = [];
       const v = this.$v.timeout;
       if (!v.$dirty) return errors;
-      !v.required && errors.push("Interval/Timeout is required");
-      !v.integer && errors.push("Interval/Timeout must be an integer");
-      !v.minValue && errors.push("Interval/Timeout must be greater then 1");
+      !v.required && errors.push("Timeout is required");
+      !v.integer && errors.push("Timeout must be an integer");
+      !v.minValue && errors.push("Timeout must be greater then 1");
+      return errors;
+    },
+    intervalErrors() {
+      const errors = [];
+      const v = this.$v.interval;
+      if (!v.$dirty) return errors;
+      !v.required && errors.push("Interval is required");
+      !v.integer && errors.push("Interval must be an integer");
+      !v.minValue && errors.push("Interval must be greater then 1");
       return errors;
     },
     validStatusErrors() {
@@ -286,7 +339,6 @@ export default {
     async submit() {
       const server = {
         label: this.label,
-        timeout: parseInt(this.timeout, 10),
         mode: this.modes[this.mode].key,
         config: {},
       };
@@ -296,20 +348,35 @@ export default {
           server.config = {
             url: this.url,
             validStatus: this.validStatus.map((status) => parseInt(status, 10)),
+            timeout: parseInt(this.timeout, 10),
+            interval: parseInt(this.interval, 10),
           };
           break;
         case 1:
           server.config = {
             address: this.address,
             port: parseInt(this.port, 10),
+            timeout: parseInt(this.timeout, 10),
+            interval: parseInt(this.interval, 10),
+          };
+          break;
+        case 2:
+          server.config = {
+            interval: parseInt(this.interval, 10),
           };
           break;
         default:
           break;
       }
-      
-      await this.$http.put("/servers", server);
-      this.$notify("success", "Server added.");
+
+      if (this.editId) {
+        await this.$http.post(`/servers/${this.editId}`, server);
+        this.$notify("success", "Changes saved.");
+      } else {
+        await this.$http.put("/servers", server);
+        this.$notify("success", "Server added.");
+      }
+
       this.$router.back();
     },
   },

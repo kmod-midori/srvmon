@@ -29,6 +29,18 @@ const routes = [
       import(/* webpackChunkName: "servers" */ "../views/Servers.vue"),
   },
   {
+    path: "/servers/:id",
+    name: "Server",
+    component: () =>
+      import(/* webpackChunkName: "server" */ "../views/Server.vue"),
+  },
+  {
+    path: "/servers/:id/edit",
+    name: "Edit Server",
+    component: () =>
+      import(/* webpackChunkName: "add_server" */ "../views/AddServer.vue"),
+  },
+  {
     path: "/contacts/add",
     name: "Add Contact",
     component: () =>

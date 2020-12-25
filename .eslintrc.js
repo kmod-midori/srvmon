@@ -18,6 +18,7 @@ module.exports = {
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
     "no-unused-vars": "warn",
-    "prefer-const": "off"
+    "prefer-const": "off",
+    "vue/valid-v-slot": "off",
   },
 };

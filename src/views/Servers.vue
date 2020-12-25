@@ -2,11 +2,28 @@
   <div>
     <v-data-table
       :headers="headers"
-      :items="desserts"
+      :items="servers"
+      :loading="loading"
+      :options.sync="options"
+      :server-items-length="totalServers"
       class="elevation-1"
-    ></v-data-table>
+    >
+      <template v-slot:item.label="{ item }">
+        <router-link :to="`/servers/${item.id}`">
+          {{ item.label }}
+        </router-link>
+      </template>
+      <template v-slot:item.enabled="{ item }">
+        <v-chip :color="item.enabled ? 'success' : 'grey'" dark>
+          {{ item.enabled ? "Yes" : "No" }}
+        </v-chip>
+      </template>
+    </v-data-table>
+    {{ servers }}
     <v-fab-transition>
-      <v-btn fab fixed bottom right dark to="/servers/add"><v-icon>mdi-plus</v-icon></v-btn>
+      <v-btn fab fixed bottom right dark to="/servers/add">
+        <v-icon>mdi-plus</v-icon>
+      </v-btn>
     </v-fab-transition>
   </div>
 </template>
@@ -17,100 +34,54 @@ export default {
     return {
       headers: [
         {
-          text: "Dessert (100g serving)",
-          align: "start",
-          sortable: false,
-          value: "name",
-        },
-        { text: "Calories", value: "calories" },
-        { text: "Fat (g)", value: "fat" },
-        { text: "Carbs (g)", value: "carbs" },
-        { text: "Protein (g)", value: "protein" },
-        { text: "Iron (%)", value: "iron" },
-      ],
-      desserts: [
-        {
-          name: "Frozen Yogurt",
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-          iron: "1%",
+          text: "Server",
+          value: "label",
         },
         {
-          name: "Ice cream sandwich",
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
-          iron: "1%",
-        },
-        {
-          name: "Eclair",
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0,
-          iron: "7%",
-        },
-        {
-          name: "Cupcake",
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3,
-          iron: "8%",
-        },
-        {
-          name: "Gingerbread",
-          calories: 356,
-          fat: 16.0,
-          carbs: 49,
-          protein: 3.9,
-          iron: "16%",
-        },
-        {
-          name: "Jelly bean",
-          calories: 375,
-          fat: 0.0,
-          carbs: 94,
-          protein: 0.0,
-          iron: "0%",
-        },
-        {
-          name: "Lollipop",
-          calories: 392,
-          fat: 0.2,
-          carbs: 98,
-          protein: 0,
-          iron: "2%",
-        },
-        {
-          name: "Honeycomb",
-          calories: 408,
-          fat: 3.2,
-          carbs: 87,
-          protein: 6.5,
-          iron: "45%",
-        },
-        {
-          name: "Donut",
-          calories: 452,
-          fat: 25.0,
-          carbs: 51,
-          protein: 4.9,
-          iron: "22%",
-        },
-        {
-          name: "KitKat",
-          calories: 518,
-          fat: 26.0,
-          carbs: 65,
-          protein: 7,
-          iron: "6%",
+          text: "Enabled",
+          value: "enabled",
         },
       ],
+
+      servers: [],
+      loading: false,
+      totalServers: 0,
+      options: {
+        page: 1,
+        itemsPerPage: 10,
+      },
     };
+  },
+  mounted() {
+    this.loadServers();
+  },
+  methods: {
+    async loadServers() {
+      this.loading = true;
+      this.$http
+        .get("/servers", {
+          params: {
+            with_status: true,
+            ...this.options,
+          },
+        })
+        .then((resp) => {
+          const payload = resp.data.payload;
+          this.servers = payload.items;
+          this.totalServers = payload.total;
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+  },
+  watch: {
+    options: {
+      handler() {
+        this.loadServers();
+      },
+      deep: true,
+    },
   },
 };
 </script>
