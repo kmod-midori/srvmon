@@ -10,6 +10,7 @@ from .db import db, migrate
 from .security import security
 from .mail import mail
 from .api import api_bp
+from .socketio import socketio
 
 app.register_blueprint(api_bp, url_prefix='/api')
 

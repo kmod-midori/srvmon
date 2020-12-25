@@ -1,20 +1,48 @@
 <template>
   <div>
     <v-row>
-      <v-col sm="12" md="6">
+      <v-col cols="12" lg="6">
         <v-card>
           <v-card-title>
             <v-icon left>mdi-server</v-icon>
             {{ server.label }}
           </v-card-title>
-          <v-card-subtitle>
-            Mode: {{ modes[server.mode] }}<br />
-            <template v-if="server.mode === 'active-http'">
-              Test URL: <a :href="server.config.url">{{ server.config.url }}</a>
-              <br />
-              Valid status codes: {{ server.config.validStatus.join(", ") }}
-            </template>
-          </v-card-subtitle>
+          <v-list-item>
+            <v-list-item-title>Mode</v-list-item-title>
+            <v-list-item-subtitle>
+              {{ modes[server.mode] }}
+            </v-list-item-subtitle>
+          </v-list-item>
+
+          <template v-if="server.mode === 'active-http'">
+            <v-list-item>
+              <v-list-item-title>Test URL</v-list-item-title>
+              <v-list-item-subtitle>
+                <a :href="server.config.url">{{ server.config.url }}</a>
+              </v-list-item-subtitle>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title>Valid Status Codes</v-list-item-title>
+              <v-list-item-subtitle>
+                {{ server.config.validStatus.join(", ") }}
+              </v-list-item-subtitle>
+            </v-list-item>
+          </template>
+
+          <v-list-item>
+            <v-list-item-title>Interval</v-list-item-title>
+            <v-list-item-subtitle>
+              {{ server.config.interval }} seconds
+            </v-list-item-subtitle>
+          </v-list-item>
+
+          <v-list-item v-if="server.mode !== 'passive-http'">
+            <v-list-item-title>Timeout</v-list-item-title>
+            <v-list-item-subtitle>
+              {{ server.config.timeout }} ms
+            </v-list-item-subtitle>
+          </v-list-item>
+
           <v-card-actions>
             <v-btn icon :to="`/servers/${id}/edit`">
               <v-icon>mdi-cog</v-icon>
@@ -36,15 +64,48 @@
         </v-card>
       </v-col>
 
-      <v-col sm="12" md="6">
+      <v-col cols="12" lg="6">
         <v-card class="mt-1">
           <v-card-title>
             <v-icon left>mdi-speedometer</v-icon>
             Status
+            <v-chip v-if="online" class="ml-2" color="success">
+              <v-avatar left>
+                <v-icon small>mdi-server</v-icon>
+              </v-avatar>
+              Online
+            </v-chip>
+            <v-chip v-else class="ml-2" color="error">
+              <v-avatar left>
+                <v-icon small>mdi-server-remove</v-icon>
+              </v-avatar>
+              Offline
+            </v-chip>
           </v-card-title>
+
+          <v-list-item>
+            <v-list-item-title>Last Checked</v-list-item-title>
+            <v-list-item-subtitle> 5 minutes ago </v-list-item-subtitle>
+          </v-list-item>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              v-if="server.mode !== 'passive-http'"
+              icon
+              @click="scheduleCheck"
+            >
+              <v-icon>mdi-refresh</v-icon>
+            </v-btn>
+          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
+    <v-card>
+      <v-card-title>
+        <v-icon left>mdi-clock</v-icon>
+        History
+      </v-card-title>
+    </v-card>
   </div>
 </template>
 
@@ -61,6 +122,7 @@ export default {
         "active-http": "Active HTTP",
         "active-tcp": "Active TCP",
       },
+      online: false,
     };
   },
   mounted() {
@@ -86,6 +148,9 @@ export default {
     setServer(server) {
       this.server = server;
       this.enabled = this.server.enabled;
+    },
+    scheduleCheck() {
+      this.$notify("success", "Check scheduled");
     },
   },
 };

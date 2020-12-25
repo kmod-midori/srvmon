@@ -3,7 +3,7 @@ import functools
 from flask_socketio import SocketIO, disconnect, emit
 from flask_security import current_user
 
-socketio = SocketIO(app)
+socketio = SocketIO(app, path="/api/socket.io")
 
 
 def authenticated_only(f):
