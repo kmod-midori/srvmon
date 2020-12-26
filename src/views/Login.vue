@@ -67,6 +67,9 @@ export default {
       loading: false,
     };
   },
+  mounted() {
+    this.$socket.disconnect();
+  },
   methods: {
     login() {
       this.loading = true;
@@ -99,6 +102,7 @@ export default {
     },
     loginOk() {
       this.$router.replace("/");
+      this.$socket.connect();
       this.$notify("success", "You are logged in.");
     },
   },

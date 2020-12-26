@@ -156,8 +156,6 @@ export default {
         // Truncate to 50
         this.records = this.records.slice(0, 50);
       }
-      this.online = record.online;
-      this.lastChecked = record.time;
     },
   },
   mounted() {
@@ -175,9 +173,11 @@ export default {
       this.$http.get(`/servers/${this.id}`).then((resp) => {
         this.server = resp.data.payload;
       });
-      this.$http.get(`/servers/${this.id}/records?itemsPerPage=10`).then((resp) => {
-        this.records = resp.data.payload.items;
-      });
+      this.$http
+        .get(`/servers/${this.id}/records?itemsPerPage=10`)
+        .then((resp) => {
+          this.records = resp.data.payload.items;
+        });
     },
     toggleEnabled() {
       this.enabledToggling = true;
