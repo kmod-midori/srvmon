@@ -114,7 +114,7 @@ export default {
   data() {
     return {
       id: parseInt(this.$route.params.id, 10),
-      server: {},
+      server: { config: {} },
       enabled: false,
       enabledToggling: false,
       modes: {

@@ -20,5 +20,6 @@ module.exports = {
     "no-unused-vars": "warn",
     "prefer-const": "off",
     "vue/valid-v-slot": "off",
+    "no-new": "off"
   },
 };

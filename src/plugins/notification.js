@@ -14,4 +14,30 @@ function toast(type, message, timeout = 3000) {
 
 Vue.prototype.$notify = toast;
 
+async function requestNativePermission() {
+  if (!("Notification" in window) || Notification.permission === "denied") {
+    return false;
+  }
+
+  if (Notification.permission !== "granted") {
+    await Notification.requestPermission();
+  }
+
+  return Notification.permission === "granted";
+}
+
+Vue.prototype.$notifyNative = async function (title) {
+  if (await requestNativePermission()) {
+    new Notification("Server Monitor", {
+      body: title,
+    });
+  }
+};
+
+document.addEventListener("load", function () {
+  if (requestNativePermission()) {
+    console.info("Notification permission granted.");
+  }
+});
+
 export default toast;

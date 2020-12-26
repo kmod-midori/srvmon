@@ -55,6 +55,7 @@ server_schema = {
     'config': server_config_schema,
     'enabled': {
         'type': 'boolean',
+        'default': True,
     }
 }
 
