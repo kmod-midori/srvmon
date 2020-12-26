@@ -5,7 +5,8 @@ import router from "./router";
 import vuetify from "./plugins/vuetify";
 import "./plugins/axios";
 import "./plugins/notification";
-import "./plugins/socket"
+import "./plugins/socket";
+import "./plugins/luxon";
 import store from "./store";
 
 Vue.config.productionTip = false;

@@ -69,23 +69,14 @@
           <v-card-title>
             <v-icon left>mdi-speedometer</v-icon>
             Status
-            <v-chip v-if="online" class="ml-2" color="success">
-              <v-avatar left>
-                <v-icon small>mdi-server</v-icon>
-              </v-avatar>
-              Online
-            </v-chip>
-            <v-chip v-else class="ml-2" color="error">
-              <v-avatar left>
-                <v-icon small>mdi-server-remove</v-icon>
-              </v-avatar>
-              Offline
-            </v-chip>
+            <StatusIndicator class="ml-2" :online="true" />
           </v-card-title>
 
-          <v-list-item>
+          <v-list-item v-if="lastChecked">
             <v-list-item-title>Last Checked</v-list-item-title>
-            <v-list-item-subtitle> 5 minutes ago </v-list-item-subtitle>
+            <v-list-item-subtitle>{{
+              lastChecked | luxon("yyyy-MM-dd HH:mm:ss")
+            }}</v-list-item-subtitle>
           </v-list-item>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -105,33 +96,87 @@
         <v-icon left>mdi-clock</v-icon>
         History
       </v-card-title>
+      <v-data-table :headers="recordHeaders" :items="records">
+        <template v-slot:item.time="{ item }">
+          {{ item.time | luxon("yyyy-MM-dd HH:mm:ss") }}
+        </template>
+        <template v-slot:item.online="{ item }">
+          <StatusIndicator :online="item.online" />
+          <span v-if="item.message" class="ml-1">{{ item.message }}</span>
+        </template>
+      </v-data-table>
     </v-card>
   </div>
 </template>
 
 <script>
+import StatusIndicator from "@/components/StatusIndicator";
 export default {
+  components: { StatusIndicator },
   data() {
     return {
       id: parseInt(this.$route.params.id, 10),
       server: { config: {} },
-      enabled: false,
       enabledToggling: false,
       modes: {
         "passive-http": "Passive HTTP",
         "active-http": "Active HTTP",
         "active-tcp": "Active TCP",
       },
-      online: false,
+      records: [],
+      recordHeaders: [
+        {
+          text: "Time",
+          value: "time",
+        },
+        {
+          text: "Status",
+          value: "online",
+        },
+        {
+          text: "Latency (ms)",
+          value: "latency",
+        },
+      ],
     };
+  },
+  sockets: {
+    connect() {
+      this.startMon();
+    },
+    new_record(record) {
+      if (record.server_id !== this.id) return;
+      for (const rec of this.records) {
+        if (rec.id === record.id) {
+          return;
+        }
+      }
+      this.records.unshift(record);
+      if (this.records.length > 50) {
+        // Truncate to 50
+        this.records = this.records.slice(0, 50);
+      }
+      this.online = record.online;
+      this.lastChecked = record.time;
+    },
   },
   mounted() {
     this.loadServer();
+    this.startMon();
+  },
+  destroyed() {
+    this.$socket.emit("stop_mon", { id: this.id });
   },
   methods: {
+    startMon() {
+      this.$socket.emit("start_mon", { id: this.id });
+    },
     loadServer() {
       this.$http.get(`/servers/${this.id}`).then((resp) => {
-        this.setServer(resp.data.payload);
+        this.server = resp.data.payload;
+      });
+      this.$http.get(`/servers/${this.id}/records?itemsPerPage=10`).then((resp) => {
+        this.records = resp.data.payload.items;
       });
     },
     toggleEnabled() {
@@ -139,18 +184,24 @@ export default {
       this.$http
         .post(`/servers/${this.id}`, { enabled: !this.server.enabled })
         .then((resp) => {
-          this.setServer(resp.data.payload);
+          this.server = resp.data.payload;
         })
         .finally(() => {
           this.enabledToggling = false;
         });
     },
-    setServer(server) {
-      this.server = server;
-      this.enabled = this.server.enabled;
-    },
     scheduleCheck() {
       this.$notify("success", "Check scheduled");
+    },
+  },
+  computed: {
+    online() {
+      if (this.records.length === 0) return null;
+      return this.records[0].online;
+    },
+    lastChecked() {
+      if (this.records.length === 0) return 0;
+      return this.records[0].time;
     },
   },
 };

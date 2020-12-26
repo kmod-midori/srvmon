@@ -7,7 +7,6 @@ const instance = axios.create({ baseURL: "/api", maxRedirects: 0 });
 
 instance.interceptors.response.use(
   function (resp) {
-    console.log(resp);
     return resp;
   },
   function (err) {

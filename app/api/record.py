@@ -14,5 +14,5 @@ def get_records(server_id):
     if not params:
         return render_json_err("Validation failed", validator.errors)
 
-    query = Record.query.filter_by(server_id=server_id)
+    query = Record.query.filter_by(server_id=server_id).order_by(Record.time.desc())
     return render_paginated(query, params)

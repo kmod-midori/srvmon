@@ -2,6 +2,7 @@ from app import app
 import requests, sys
 from datetime import datetime, timedelta
 from .db import Server, Record, transaction, db
+from blinker import Namespace
 
 def log_start(server):
     app.logger.debug("Start checking [%s](%s)", server.label, server.id)
@@ -45,6 +46,7 @@ def handle_active_http(server):
 
     with transaction():
         db.session.add(record)
+    signal_new_record.send(record=record)
 
 
 def handle_active_tcp(server):
@@ -60,3 +62,6 @@ handlers = {
     'passive-http': handle_passive_http,
     'active-tcp': handle_active_tcp
 }
+
+signals = Namespace()
+signal_new_record = signals.signal('new-record')

@@ -27,11 +27,17 @@ def add_server():
 @api_bp.route('/servers', methods=['GET'])
 @auth_required()
 def get_servers():
-    validator = validators.with_paging(
-        {'enabled': {
+    validator = validators.with_paging({
+        'enabled': {
             'type': 'boolean',
             'coerce': (str, validators.to_bool)
-        }})
+        },
+        'with_status': {
+            'type': 'boolean',
+            'coerce': (str, validators.to_bool),
+            'default': False
+        }
+    })
     params = validator.validated(dict(request.args))
     if not params:
         return render_json_err("Validation failed", validator.errors)
@@ -39,7 +45,10 @@ def get_servers():
     query = Server.query
     if 'enabled' in params:
         query = query.filter_by(enabled=params['enabled'])
-    return render_paginated(query, params)
+    if params['with_status']:
+        return render_paginated(query, params, lambda s: s.to_dict_ext())
+    else:
+        return render_paginated(query, params)
 
 
 @api_bp.route('/servers/<int:server_id>', methods=['GET'])

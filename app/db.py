@@ -66,8 +66,27 @@ class Server(db.Model):
             'enabled': self.enabled,
         }
 
+    def to_dict_ext(self):
+        """
+        To dict with extra information that comes with an overhead
+        """
+        d = self.to_dict()
+        lr = self.last_record()
+        if lr:
+            d['lastRecord'] = lr.to_dict()
+        else:
+            d['lastRecord'] = None
+        return d
+
     def last_record(self):
         return self.records.order_by(Record.time.desc()).first()
+
+    def is_online(self):
+        last_record = self.last_record()
+        if last_record:
+            return last_record.online
+        else:
+            return None
 
     def should_check(self):
         last_record = self.last_record()

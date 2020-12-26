@@ -4,6 +4,6 @@ load_dotenv(dotenv_path="./.flaskenv")
 from app import app
 from app.socketio import socketio
 
-socketio.run(app, port=5000)
+socketio.run(app, port=5000, debug=True)
 # To Run:
 # python run.py

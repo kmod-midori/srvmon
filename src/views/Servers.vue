@@ -18,6 +18,15 @@
           {{ item.enabled ? "Yes" : "No" }}
         </v-chip>
       </template>
+      <template v-slot:item.lastRecord="{ item }">
+        <template v-if="item.lastRecord">
+          <StatusIndicator :online="item.lastRecord.online" />
+          {{ item.lastRecord.time | luxon }}
+        </template>
+        <template v-else>
+          <StatusIndicator :online="null" />
+        </template>
+      </template>
     </v-data-table>
     {{ servers }}
     <v-fab-transition>
@@ -29,7 +38,9 @@
 </template>
 
 <script>
+import StatusIndicator from "@/components/StatusIndicator";
 export default {
+  components: { StatusIndicator },
   data() {
     return {
       headers: [
@@ -40,6 +51,11 @@ export default {
         {
           text: "Enabled",
           value: "enabled",
+        },
+        {
+          text: "Last Checked",
+          sortable: false,
+          value: "lastRecord",
         },
       ],
 

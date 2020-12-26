@@ -1,4 +1,6 @@
 from flask import Flask
+import eventlet
+eventlet.monkey_patch()
 
 app = Flask(__name__, static_url_path='', static_folder='../dist')
 
