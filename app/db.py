@@ -103,6 +103,21 @@ class Contact(db.Model):
     config = db.Column(db.Text, nullable=False)  # Stored as JSON
     enabled = db.Column(db.Boolean, nullable=False)
 
+    def set_config(self, config):
+        self.config = json.dumps(config)
+
+    def get_config(self):
+        return json.loads(self.config)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'type': self.type,
+            'config': self.get_config(),
+            'enabled': self.enabled
+        }
+
 
 class Record(db.Model):
     id = db.Column(db.Integer, primary_key=True)

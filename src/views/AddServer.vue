@@ -20,7 +20,11 @@
           <v-card>
             <v-list>
               <v-list-item-group v-model="mode" mandatory>
-                <v-list-item v-for="item in modes" :key="item.key">
+                <v-list-item
+                  v-for="item in modes"
+                  :key="item.key"
+                  :disabled="item.disabled"
+                >
                   <v-list-item-content>
                     <v-list-item-title v-text="item.title"></v-list-item-title>
                     <v-list-item-subtitle
@@ -206,9 +210,10 @@ export default {
         },
         {
           key: "passive-http",
-          title: "Passive HTTP",
+          title: "Passive HTTP (coming soon)",
           desc:
             "Your server will make a HTTP request to a URL that will be generated.",
+          disabled: true,
         },
       ],
       statuses: [
@@ -296,7 +301,7 @@ export default {
     addressErrors() {
       const errors = [];
       if (!this.$v.address.$dirty) return errors;
-      !this.$v.address.required && errors.push("Label is required");
+      !this.$v.address.required && errors.push("Address is required");
       return errors;
     },
     portErrors() {

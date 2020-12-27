@@ -61,11 +61,12 @@ def get_server(server_id):
 @api_bp.route('/servers/<int:server_id>', methods=['POST'])
 @auth_required()
 def update_server(server_id):
-    server = Server.query.get_or_404(server_id)
     validator = validators.server_validator(False)
     data = validator.validated(request.get_json())
     if not data: return render_json_err("Validation failed", validator.errors)
+    
     with transaction():
+        server = Server.query.get_or_404(server_id)
         if 'label' in data:
             server.label = data['label']
         if 'mode' in data:
@@ -75,3 +76,12 @@ def update_server(server_id):
         if 'config' in data:
             server.set_config(data['config'])
     return render_json_ok(**server.to_dict())
+
+
+@api_bp.route('/servers/<int:server_id>', methods=['DELETE'])
+@auth_required()
+def delete_server(server_id):
+    with transaction():
+        server = Server.query.get_or_404(server_id)
+        db.session.delete(server)
+    return render_json_ok(id=server_id)

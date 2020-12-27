@@ -2,8 +2,17 @@
   <div>
     <v-menu v-if="user" open-on-hover offset-y>
       <template v-slot:activator="{ on, attrs }">
-        <v-btn dark v-bind="attrs" v-on="on" text>
-          {{ user.email }}
+        <v-btn
+          dark
+          v-bind="attrs"
+          v-on="on"
+          :text="!$vuetify.breakpoint.mobile"
+          :icon="$vuetify.breakpoint.mobile"
+        >
+          <template v-if="$vuetify.breakpoint.mobile">
+            <v-icon>mdi-account-circle</v-icon>
+          </template>
+          <template v-else>{{ user.email }}</template>
         </v-btn>
       </template>
       <v-list>

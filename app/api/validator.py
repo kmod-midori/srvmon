@@ -90,3 +90,43 @@ def with_paging(schema):
 
 def paging_validator():
     return Validator(paging_schema)
+
+
+contact_schema = {
+    'type': {
+        'type': 'string',
+        'allowed': ['email', 'webhook']
+    },
+    'enabled': {
+        'type': 'boolean',
+        'default': True
+    },
+    'config': {
+        'type':
+        'dict',
+        'require_all':
+        True,
+        'anyof_schema': [
+            {
+                # Webhook
+                'url': {
+                    'type': 'string'
+                },
+                'service': {
+                    'type': 'string',
+                    'allowed': ['ding', 'discord']
+                }
+            },
+            {
+                # Email
+                'address': {
+                    'type': 'string',
+                }
+            }
+        ]
+    }
+}
+
+
+def contact_validator(require_all=True):
+    return Validator(contact_schema, require_all=require_all)

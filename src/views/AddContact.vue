@@ -1,22 +1,9 @@
 <template>
   <div>
-    <v-form>
-      <v-row>
-        <v-col>
-          <v-text-field
-            v-model="label"
-            label="Label"
-            required
-            :error-messages="labelErrors"
-            @input="$v.label.$touch()"
-            @blur="$v.label.$touch()"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-
+    <v-form @submit.prevent="submit">
       <v-row>
         <!-- Mode Selector -->
-        <v-col sm="12" md="6">
+        <v-col cols="12" md="6">
           <v-card>
             <v-list>
               <v-list-item-group v-model="mode" mandatory>
@@ -29,14 +16,47 @@
             </v-list>
           </v-card>
         </v-col>
+        <!-- Mode Specific -->
+        <v-col class="py-0">
+          <v-row>
+            <template v-if="mode == 0">
+              <v-col>
+                <v-text-field
+                  type="email"
+                  v-model="address"
+                  label="Address"
+                  required
+                  :error-messages="addressErrors"
+                  @input="$v.address.$touch()"
+                  @blur="$v.address.$touch()"
+                ></v-text-field>
+              </v-col>
+            </template>
+
+            <template v-else-if="mode == 1">
+              <v-col cols="12" md="4">
+                <v-select
+                  v-model="service"
+                  label="Service"
+                  :items="services"
+                  item-text="name"
+                  item-value="value"
+                ></v-select>
+              </v-col>
+              <v-col cols="12" md="8">
+                <v-text-field
+                  v-model="url"
+                  label="URL"
+                  required
+                  :error-messages="urlErrors"
+                  @input="$v.url.$touch()"
+                  @blur="$v.url.$touch()"
+                ></v-text-field>
+              </v-col>
+            </template>
+          </v-row>
+        </v-col>
       </v-row>
-      <!-- Mode Specific -->
-      <v-col class="py-0">
-        <v-row>
-          <template v-if="mode == 0"></template>
-          <template v-else-if="mode == 1"></template>
-        </v-row>
-      </v-col>
     </v-form>
 
     <v-fab-transition>
@@ -66,31 +86,45 @@ import {
   email,
 } from "vuelidate/lib/validators";
 import { isWebUri } from "valid-url";
-
+const url = (value) => !helpers.req(value) || !!isWebUri(value);
 export default {
   mixins: [validationMixin],
   validations() {
-    const v = {
-      label: {
-        required,
-      },
-    };
+    const v = {};
+
+    if (this.mode === 0) {
+      v.address = { required, email };
+    } else if (this.mode === 1) {
+      v.url = { required, url };
+    }
 
     return v;
   },
 
   data() {
     return {
-      label: "",
       mode: 0,
       modes: [
         {
           key: "email",
-          title: "E-mail",
+          title: "Email",
         },
         {
           key: "webhook",
           title: "Webhook",
+        },
+      ],
+      address: "",
+      url: "",
+      service: "ding",
+      services: [
+        {
+          name: "DingTalk",
+          value: "ding",
+        },
+        {
+          name: "Discord",
+          value: "discord",
         },
       ],
     };
@@ -103,10 +137,49 @@ export default {
       !this.$v.label.required && errors.push("Label is required");
       return errors;
     },
+    addressErrors() {
+      const errors = [];
+      if (!this.$v.address.$dirty) return errors;
+      !this.$v.address.required && errors.push("Address is required");
+      !this.$v.address.email && errors.push("Invalid email address");
+      return errors;
+    },
+    urlErrors() {
+      const errors = [];
+      const v = this.$v.url;
+      if (!v.$dirty) return errors;
+      !v.required && errors.push("URL is required");
+      !v.url && errors.push("Invalid URL");
+      return errors;
+    },
   },
 
   methods: {
-    submit() {},
+    async submit() {
+      if (this.$v.$invalid) return;
+      const contact = {
+        type: this.modes[this.mode].key,
+      };
+      switch (this.mode) {
+        case 0:
+          // email
+          contact.config = {
+            address: this.address,
+          };
+          break;
+        case 1:
+          // webhook
+          contact.config = {
+            service: this.service,
+            url: this.url,
+          };
+          break;
+      }
+
+      await this.$http.put("/contacts", contact);
+      this.$notify("success", "Contact added.");
+      this.$router.back();
+    },
   },
 };
 </script>
