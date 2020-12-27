@@ -88,12 +88,6 @@ class Server(db.Model):
         else:
             return None
 
-    def should_check(self):
-        last_record = self.last_record()
-        config = self.get_config()
-        interval = config['interval']
-        return last_record is None or last_record.expired(interval)
-
     def new_record(self):
         return Record(server_id=self.id,
                       time=datetime.now(),
@@ -133,6 +127,17 @@ class Record(db.Model):
     def expired(self, interval):
         delta = datetime.now().timestamp() - self.time.timestamp()
         return delta > interval
+
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    server_id = db.Column(db.Integer,
+                          db.ForeignKey("server.id"),
+                          nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    time = db.Column(db.DateTime, nullable=False)
+    status = db.Column(db.Boolean, nullable=False)
+    message = db.Column(db.Text, nullable=True)
 
 
 @contextlib.contextmanager

@@ -8,9 +8,14 @@ from .checkers import handlers
 
 def task_check():
     servers = Server.query.filter_by(enabled=True).all()
+    threads = []
     for server in servers:
-        if server.should_check():
-            handlers[server.mode](server)
+        threads.append(eventlet.spawn(handlers[server.mode], server))
+    for thread in threads:
+        try:
+            thread.wait()
+        except Exception as e:
+            print(e)
 
 
 def loop_check():

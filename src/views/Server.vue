@@ -28,6 +28,15 @@
               </v-list-item-subtitle>
             </v-list-item>
           </template>
+          
+          <template v-else-if="server.mode === 'active-tcp'">
+            <v-list-item>
+              <v-list-item-title>Test Address</v-list-item-title>
+              <v-list-item-subtitle>
+                {{ server.config.address }}:{{ server.config.port }}
+              </v-list-item-subtitle>
+            </v-list-item>
+          </template>
 
           <v-list-item>
             <v-list-item-title>Interval</v-list-item-title>
@@ -69,7 +78,7 @@
           <v-card-title>
             <v-icon left>mdi-speedometer</v-icon>
             Status
-            <StatusIndicator class="ml-2" :online="true" />
+            <StatusIndicator class="ml-2" :online="online" />
           </v-card-title>
 
           <v-list-item v-if="lastChecked">

@@ -28,7 +28,7 @@
         </template>
       </template>
     </v-data-table>
-    {{ servers }}
+
     <v-fab-transition>
       <v-btn fab fixed bottom right dark to="/servers/add">
         <v-icon>mdi-plus</v-icon>
