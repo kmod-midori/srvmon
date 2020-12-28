@@ -22,14 +22,9 @@ export default {
   data: () => ({
     items: [
       {
-        icon: "mdi-home",
-        title: "Home",
-        to: "/",
-      },
-      {
         icon: "mdi-server",
         title: "Servers",
-        to: "/servers",
+        to: "/",
       },
       {
         icon: "mdi-contacts",

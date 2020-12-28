@@ -28,7 +28,7 @@
               </v-list-item-subtitle>
             </v-list-item>
           </template>
-          
+
           <template v-else-if="server.mode === 'active-tcp'">
             <v-list-item>
               <v-list-item-title>Test Address</v-list-item-title>
@@ -56,6 +56,14 @@
             <v-btn icon :to="`/servers/${id}/edit`">
               <v-icon>mdi-cog</v-icon>
             </v-btn>
+            <v-chip v-if="server.watching" color="success" @click="unwatch">
+              <v-avatar left><v-icon>mdi-bell</v-icon></v-avatar>
+              Watching
+            </v-chip>
+            <v-chip v-else color="grey" @click="watch">
+              <v-avatar left><v-icon>mdi-bell-off</v-icon></v-avatar>
+              Not Watching
+            </v-chip>
             <v-spacer />
             <v-chip
               :color="server.enabled ? 'success' : 'grey'"
@@ -87,19 +95,10 @@
               lastChecked | luxon("yyyy-MM-dd HH:mm:ss")
             }}</v-list-item-subtitle>
           </v-list-item>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              v-if="server.mode !== 'passive-http'"
-              icon
-              @click="scheduleCheck"
-            >
-              <v-icon>mdi-refresh</v-icon>
-            </v-btn>
-          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
+
     <v-card>
       <v-card-title>
         <v-icon left>mdi-clock</v-icon>
@@ -169,6 +168,7 @@ export default {
   },
   mounted() {
     this.loadServer();
+    this.loadRecords();
     this.startMon();
   },
   destroyed() {
@@ -178,29 +178,34 @@ export default {
     startMon() {
       this.$socket.emit("start_mon", { id: this.id });
     },
-    loadServer() {
-      this.$http.get(`/servers/${this.id}`).then((resp) => {
-        this.server = resp.data.payload;
-      });
-      this.$http
-        .get(`/servers/${this.id}/records?itemsPerPage=10`)
-        .then((resp) => {
-          this.records = resp.data.payload.items;
-        });
+    async loadServer() {
+      const resp = await this.$http.get(`/servers/${this.id}`);
+      this.server = resp.data.payload;
     },
-    toggleEnabled() {
+    async loadRecords() {
+      const resp = await this.$http.get(
+        `/servers/${this.id}/records?itemsPerPage=10`
+      );
+      this.records = resp.data.payload.items;
+    },
+    async toggleEnabled() {
       this.enabledToggling = true;
-      this.$http
-        .post(`/servers/${this.id}`, { enabled: !this.server.enabled })
-        .then((resp) => {
-          this.server = resp.data.payload;
-        })
-        .finally(() => {
-          this.enabledToggling = false;
+      try {
+        await this.$http.post(`/servers/${this.id}`, {
+          enabled: !this.server.enabled,
         });
+        this.loadServer();
+      } finally {
+        this.enabledToggling = false;
+      }
     },
-    scheduleCheck() {
-      this.$notify("success", "Check scheduled");
+    async watch() {
+      await this.$http.put(`/servers/${this.id}/watch`);
+      this.loadServer();
+    },
+    async unwatch() {
+      await this.$http.delete(`/servers/${this.id}/watch`);
+      this.loadServer();
     },
   },
   computed: {

@@ -1,9 +1,15 @@
 <template>
-  <div></div>
+  <div>
+    <h2>Change Password</h2>
+    <ChangePasswordForm />
+  </div>
 </template>
 
 <script>
-export default {};
+import ChangePasswordForm from "@/components/ChangePasswordForm";
+export default {
+  components: { ChangePasswordForm },
+};
 </script>
 
 <style lang="scss" scoped></style>

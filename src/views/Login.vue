@@ -37,7 +37,6 @@
           </v-col>
         </v-row>
       </v-form>
-      {{ $v }}
     </v-card>
   </div>
 </template>

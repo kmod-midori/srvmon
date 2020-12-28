@@ -1,29 +1,15 @@
 import os, eventlet
 
-from .db import Server
 from app import app
 
-from .checkers import handlers
-
-
-def task_check():
-    servers = Server.query.filter_by(enabled=True).all()
-    threads = []
-    for server in servers:
-        threads.append(eventlet.spawn(handlers[server.mode], server))
-    for thread in threads:
-        try:
-            thread.wait()
-        except Exception as e:
-            print(e)
-
+from .checkers import task_check
 
 def loop_check():
     while True:
         try:
             task_check()
         except Exception as e:
-            print(e)
+            app.logger.error("Error when running check task: %s", e)
         eventlet.sleep(5)
 
 

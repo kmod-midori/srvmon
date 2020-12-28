@@ -28,18 +28,10 @@ def handle_active_http(server):
     """
     config = server.get_config()
     timeout = config['timeout']
-    interval = config['interval']
     url = config['url']
     valid_status = config['validStatus']
 
-    last_record = server.last_record()
-    if last_record and not last_record.expired(interval):
-        return
-
-    log_start(server)
-
     record = server.new_record()
-
     try:
         r = requests.get(url, timeout=float(timeout) / 1000)
         if r.status_code in valid_status:
@@ -51,18 +43,13 @@ def handle_active_http(server):
         record.message = "Timed out"
     except requests.exceptions.ConnectionError as e:
         record.message = "Connection error"
+        app.logger.error("Check failed for [%s]: %s", server.label, e)
     except:
-        record.message = str(sys.exc_info()[0])
+        e = sys.exc_info()[0]
+        record.message = str(e)
+        app.logger.error("Check failed for [%s]: %s", server.label, e)
 
-    log_record(record)
-
-    with transaction():
-        db.session.add(record)
-    signal_new_record.send(record=record)
-
-    if last_record and record.online != last_record.online:
-        log_state_changed(server, record)
-        notify_state_changed(server, record)
+    return record
 
 
 def handle_active_tcp(server):
@@ -71,15 +58,8 @@ def handle_active_tcp(server):
     """
     config = server.get_config()
     timeout = config['timeout']
-    interval = config['interval']
     address = config['address']
     port = config['port']
-
-    last_record = server.last_record()
-    if last_record and not last_record.expired(interval):
-        return
-
-    log_start(server)
 
     record = server.new_record()
     try:
@@ -94,7 +74,30 @@ def handle_active_tcp(server):
         record.latency = (end - start) / timedelta(milliseconds=1)
     except Exception as e:
         record.message = str(e)
+
+    return record
+
+
+def handle_passive_http(server):
+    # print(server)
+    pass
+
+
+def handle_server(server):
+    """
+    Common handler for any server
+    """
+    config = server.get_config()
+    interval = config['interval']
+
+    last_record = server.last_record()
+    if last_record and not last_record.expired(interval):
+        return
+
+    log_start(server)
+    record = handlers[server.mode](server)
     log_record(record)
+
     with transaction():
         db.session.add(record)
 
@@ -105,9 +108,16 @@ def handle_active_tcp(server):
         notify_state_changed(server, record)
 
 
-def handle_passive_http(server):
-    # print(server)
-    pass
+def task_check():
+    servers = Server.query.filter_by(enabled=True).all()
+    threads = []
+    for server in servers:
+        threads.append(eventlet.spawn(handle_server, server))
+    for thread in threads:
+        try:
+            thread.wait()
+        except Exception as e:
+            app.logger.error("Error when running task for server: %s", e)
 
 
 handlers = {

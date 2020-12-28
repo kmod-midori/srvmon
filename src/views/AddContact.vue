@@ -77,14 +77,7 @@
 
 <script>
 import { validationMixin } from "vuelidate";
-import {
-  required,
-  integer,
-  between,
-  minValue,
-  helpers,
-  email,
-} from "vuelidate/lib/validators";
+import { required, helpers, email } from "vuelidate/lib/validators";
 import { isWebUri } from "valid-url";
 const url = (value) => !helpers.req(value) || !!isWebUri(value);
 export default {

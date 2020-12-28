@@ -23,6 +23,9 @@ class User(db.Model, fsqla.FsUserMixin):
                                backref=db.backref('user', lazy=True),
                                lazy=True)
 
+    def to_dict(self):
+        return {'id': self.id, 'email': self.email}
+
 
 server_alert_user = db.Table(
     "server_alert_user",
@@ -123,8 +126,9 @@ class Record(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     server_id = db.Column(db.Integer,
                           db.ForeignKey("server.id"),
-                          nullable=False)
-    time = db.Column(db.DateTime, nullable=False)
+                          nullable=False,
+                          index=True)
+    time = db.Column(db.DateTime, nullable=False, index=True)
     online = db.Column(db.Boolean, nullable=False)
     latency = db.Column(db.Integer, nullable=True)
     message = db.Column(db.Text, nullable=True)
