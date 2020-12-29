@@ -1,5 +1,6 @@
 from flask import Flask, request, send_file
 import eventlet, os
+from . import logging
 eventlet.monkey_patch()
 
 dist_base = os.path.join(os.path.dirname(__file__), '../dist')
