@@ -10,6 +10,7 @@ Anyone with such requirements should resort to a more complete system.
 poetry install
 npm install
 npm run build # Compiles and minifies the frontend for production
+flask db upgrade
 ```
 
 ### Compiles and hot-reloads for frontend development
