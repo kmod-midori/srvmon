@@ -33,7 +33,8 @@
               :disabled="$v.$invalid"
               @click="login"
               >Login</v-btn
-            ><v-btn>Register</v-btn>
+            >
+            <v-btn disabled>Register</v-btn>
           </v-col>
         </v-row>
       </v-form>
