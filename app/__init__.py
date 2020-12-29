@@ -4,10 +4,18 @@ eventlet.monkey_patch()
 
 dist_base = os.path.join(os.path.dirname(__file__), '../dist')
 
-app = Flask(__name__, static_url_path='/static', static_folder=dist_base + '/static')
+app = Flask(__name__,
+            static_url_path='/static',
+            static_folder=dist_base + '/static')
 
 from .config import Config
 if not app.debug:
+    file_handler = logging.FileHandler('app.log')
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(
+        logging.Formatter(
+            '%(asctime)s %(levelname)s : %(message)s'))
+    app.logger.addHandler(file_handler)
     app.logger.setLevel(logging.INFO)
 
 from . import cron
@@ -19,8 +27,8 @@ from .socketio import socketio
 
 app.register_blueprint(api_bp, url_prefix='/api')
 
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def index_client(path):
     return send_file(dist_base + '/index.html')
-

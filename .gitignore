@@ -27,3 +27,4 @@ pnpm-debug.log*
 __pycache__
 
 /.flaskenv
+*.log
