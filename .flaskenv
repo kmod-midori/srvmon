@@ -5,3 +5,4 @@ DATABASE_URI = "sqlite:///app.db"
 REGISTERABLE = 1
 MAIL_ENABLED = 0
 MAIL_PORT = 2525
+MAIL_DEFAULT_SENDER = "noreply@example.com"

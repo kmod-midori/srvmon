@@ -43,11 +43,11 @@ def handle_active_http(server):
         record.message = "Timed out"
     except requests.exceptions.ConnectionError as e:
         record.message = "Connection error"
-        app.logger.error("Check failed for [%s]: %s", server.label, e)
+        app.logger.debug("Check failed for [%s]: %s", server.label, e)
     except:
         e = sys.exc_info()[0]
         record.message = str(e)
-        app.logger.error("Check failed for [%s]: %s", server.label, e)
+        app.logger.debug("Check failed for [%s]: %s", server.label, e)
 
     return record
 

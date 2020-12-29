@@ -7,7 +7,8 @@ from .db import db, User, Role
 from .utils import render_json
 
 # Enable CSRF on all api endpoints.
-CSRFProtect(app)
+if not app.testing:     
+    CSRFProtect(app)
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)

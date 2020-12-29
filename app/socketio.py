@@ -3,6 +3,7 @@ import functools
 from flask_socketio import SocketIO, disconnect, emit, send, join_room, leave_room
 from flask_security import current_user
 from .checkers import signal_new_record
+from .notify import signal_new_notification
 
 socketio = SocketIO(
     app,
@@ -50,3 +51,13 @@ def on_new_record(sender, record):
 
 
 signal_new_record.connect(on_new_record)
+
+
+def on_notify(sender, record, server, user):
+    room = f"notify:{user.id}"
+    data = dict(server=dict(id=server.id, label=server.label),
+                record=dict(online=record.online))
+    socketio.emit('new_notify', data, to=room, broadcast=True)
+
+
+signal_new_notification.connect(on_notify)

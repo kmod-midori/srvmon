@@ -24,7 +24,15 @@ import UserControl from "@/components/UserControl";
 
 export default {
   name: "App",
-
+  sockets: {
+    new_notify(notify) {
+      this.$notifyNative(
+        `Server ${notify.server.label} is ${
+          notify.record.online ? "ONLINE" : "OFFLINE"
+        }`
+      );
+    },
+  },
   components: {
     NavDrawer,
     UserControl,
