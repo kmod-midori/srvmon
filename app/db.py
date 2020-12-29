@@ -167,3 +167,5 @@ def transaction():
     except Exception:
         db.session.rollback()
         raise
+
+db.create_all()
