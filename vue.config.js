@@ -1,5 +1,6 @@
 module.exports = {
   outputDir: "dist",
+  assetsDir: "static",
   devServer: {
     proxy: {
       "/api*": {

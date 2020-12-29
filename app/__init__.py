@@ -1,8 +1,10 @@
-from flask import Flask
-import eventlet
+from flask import Flask, request, send_file
+import eventlet, os
 eventlet.monkey_patch()
 
-app = Flask(__name__, static_url_path='', static_folder='../dist')
+dist_base = os.path.join(os.path.dirname(__file__), '../dist')
+
+app = Flask(__name__, static_url_path='/static', static_folder=dist_base + '/static')
 
 from .config import Config
 app.logger.info('FLASK_ENV = {}'.format(Config.FLASK_ENV))
@@ -19,4 +21,6 @@ app.register_blueprint(api_bp, url_prefix='/api')
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def index_client(path):
-    return app.send_static_file('index.html')
+    print(path)
+    return send_file(dist_base + '/index.html')
+
