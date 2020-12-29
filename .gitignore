@@ -25,3 +25,5 @@ pnpm-debug.log*
 # Python files
 .venv
 __pycache__
+
+/.flaskenv
