@@ -37,6 +37,11 @@
             <v-btn disabled>Register</v-btn>
           </v-col>
         </v-row>
+        <v-row>
+          <v-col>
+            Note: Cookies will only be used to store your login status and personal preferences, we will not track you using Cookies.
+          </v-col>
+        </v-row>
       </v-form>
     </v-card>
   </div>
